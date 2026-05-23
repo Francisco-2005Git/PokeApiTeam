@@ -1,1 +1,26 @@
-<p>lista-pokemon works!</p>
+<div class="contenedor-principal">
+  <h1 class="titulo-pokedex">Pokédex Nacional</h1>
+
+  <!-- Cuadrícula de Pokémon -->
+  <div class="pokedex-grid">
+    
+    <!-- La directiva *ngFor repite este bloque por cada Pokémon -->
+    <div *ngFor="let p of listaPokemon" class="tarjeta tipo-pokemon" [ngClass]="p.tipoPrincipal"[routerLink]="['/pokemon', p.id]">
+      
+      <div class="tarjeta-header">
+        <span class="id-pokemon">#{{ p.id }}</span>
+      </div>
+      
+      <img [src]="p.imagen" [alt]="p.nombre" class="pokemon-img">
+      
+      <!-- El pipe titlecase pone la primera letra en mayúscula automáticamente -->
+      <h3 class="nombre-pokemon">{{ p.nombre | titlecase }}</h3>
+      
+      <div class="etiqueta-tipo">
+        {{ p.tipoPrincipal | uppercase }}
+      </div>
+      
+    </div>
+
+  </div>
+</div>

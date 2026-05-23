@@ -1,0 +1,76 @@
+<!-- Solo mostramos la tarjeta si ya cargaron los datos -->
+<div class="pokedex-container" *ngIf="pokemon">
+  
+  <!-- Usamos ngClass para pintar el fondo según el tipo -->
+  <div class="pantallas-wrapper" [ngClass]="tipoPrincipal">
+    
+    <!-- PANTALLA IZQUIERDA: Visuales y Audio -->
+    <div class="pantalla visuales">
+      <div class="header-pokemon">
+        <h2>{{ pokemon.name | titlecase }}</h2>
+        <span>#{{ pokemon.id }}</span>
+      </div>
+
+      <!-- El Sprite Animado 3D/Showdown -->
+      <div class="imagen-principal-contenedor">
+        <img 
+          [src]="pokemon.sprites.other.showdown.front_default || pokemon.sprites.other['official-artwork'].front_default" 
+          [alt]="pokemon.name" 
+          class="img-animada">
+      </div>
+
+      <button class="btn-sonido" (click)="reproducirGrito()">
+        🔊 Reproducir Grito
+      </button>
+
+      <!-- Galería -->
+      <div class="galeria">
+        <img *ngFor="let img of galeria" [src]="img" alt="Sprite">
+      </div>
+    </div>
+
+    <!-- PANTALLA DERECHA: Datos y Estadísticas -->
+    <div class="pantalla info">
+      <div class="tipos-contenedor">
+        <span *ngFor="let tipo of pokemon.types" class="etiqueta-tipo" [ngClass]="tipo.type.name">
+          {{ tipo.type.name | uppercase }}
+        </span>
+      </div>
+
+      <div class="descripcion-caja">
+        <p>{{ descripcion }}</p>
+      </div>
+
+      <div class="stats-contenedor">
+        <h3>Estadísticas Base</h3>
+        
+        <div class="stat-fila" *ngFor="let stat of pokemon.stats">
+          <span class="stat-nombre">{{ stat.stat.name | uppercase }}</span>
+          <span class="stat-valor">{{ stat.base_stat }}</span>
+          
+          <!-- Barra de progreso para el stat (máximo 255) -->
+          <progress max="255" [value]="stat.base_stat" [ngClass]="tipoPrincipal"></progress>
+        </div>
+      </div>
+      <!-- NUEVO: Sección de Evoluciones -->
+      <div class="evoluciones-contenedor" *ngIf="evoluciones.length > 1">
+        <h3>Cadena Evolutiva</h3>
+        
+        <div class="evoluciones-lista">
+          <div *ngFor="let evo of evoluciones" 
+               class="evo-item" 
+               [ngClass]="{'pokemon-actual': evo.id === pokemon.id.toString()}"
+               [routerLink]="['/pokemon', evo.id]">
+            
+            <!-- Usamos la URL directa de la imagen usando el ID para no hacer otra petición HTTP -->
+            <img [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + evo.id + '.png'" 
+                 [alt]="evo.nombre">
+            <span>{{ evo.nombre | titlecase }}</span>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

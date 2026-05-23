@@ -1,0 +1,192 @@
+.pokedex-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: 'Press Start 2P', cursive;
+}
+
+.pantallas-wrapper {
+  display: flex;
+  gap: 2rem;
+  max-width: 1000px;
+  width: 100%;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 15px 30px rgba(0,0,0,0.4);
+  /* El color de fondo base lo dará la clase del tipo, ej. .fire */
+}
+
+.pantalla {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  padding: 1.5rem;
+  flex: 1; /* Ambas pantallas toman el mismo espacio */
+  border: 4px solid #333;
+}
+
+.header-pokemon {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.imagen-principal-contenedor {
+  background-color: rgba(0,0,0,0.05);
+  border-radius: 10px;
+  height: 250px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  border: 2px inset #ccc;
+}
+
+.img-animada {
+  height: 150px;
+  object-fit: contain;
+  filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.2));
+}
+
+.btn-sonido {
+  width: 100%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: 3px solid #2E7D32;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+}
+
+.btn-sonido:active {
+  transform: scale(0.98);
+}
+
+.galeria {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.galeria img {
+  width: 60px;
+  background-color: #eee;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.tipos-contenedor {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.etiqueta-tipo {
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: white;
+  font-size: 0.7rem;
+  text-shadow: 1px 1px 0 #000;
+  border: 2px solid rgba(0,0,0,0.3);
+}
+
+.descripcion-caja {
+  background-color: #222;
+  color: #4CAF50;
+  padding: 1rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+  border: 3px inset #555;
+}
+
+.stat-fila {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  font-size: 0.6rem;
+}
+
+.stat-nombre {
+  width: 90px;
+}
+
+.stat-valor {
+  width: 40px;
+  text-align: right;
+  margin-right: 10px;
+}
+
+/* Estilos de la barra de progreso */
+progress {
+  flex-grow: 1;
+  height: 12px;
+  -webkit-appearance: none;
+}
+
+progress::-webkit-progress-bar {
+  background-color: #eee;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+progress::-webkit-progress-value {
+  background-color: #4CAF50; /* Puedes cambiar esto para que coincida con el tipo */
+  border-radius: 10px;
+}
+
+/* ... (Tus estilos anteriores) ... */
+
+.evoluciones-contenedor {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 2px dashed #ccc;
+}
+
+.evoluciones-lista {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto; /* Permite scroll horizontal si hay muchas evoluciones (ej. Eevee) */
+  padding-bottom: 10px;
+}
+
+.evo-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(0,0,0,0.05);
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+  border: 2px solid transparent;
+}
+
+.evo-item:hover {
+  background-color: rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+}
+
+.evo-item img {
+  width: 60px;
+  height: 60px;
+}
+
+.evo-item span {
+  font-size: 0.6rem;
+  margin-top: 5px;
+}
+
+/* Resalta el Pokémon que estamos viendo actualmente en la lista */
+.pokemon-actual {
+  background-color: rgba(76, 175, 80, 0.2);
+  border-color: #4CAF50;
+  pointer-events: none; /* Evita que el usuario haga clic en el Pokémon en el que ya está */
+}

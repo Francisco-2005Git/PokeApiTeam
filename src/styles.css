@@ -1,1 +1,35 @@
-/* You can add global styles to this file, and also import other style files */
+/* 1. CLASE BASE: Contiene todo lo que se repite */
+.tipo-pokemon {
+    display: inline-block;
+    text-align: center;
+    width: 90px;
+    border-style: solid;
+    border-width: 1px; /* Nota: 0.2px a veces no se renderiza bien, 1px es más seguro */
+    font-family: 'Press Start 2P', cursive;
+    font-size: 11px;
+    padding: 0.2rem;
+    color: white; /* Color por defecto */
+    margin: 2px; /* Un pequeño margen para que no se peguen si tienen 2 tipos */
+}
+
+/* 2. CLASES ESPECÍFICAS: Solo definen los colores */
+.bug {
+    background-color: rgb(109, 145, 37);
+    border-color: rgb(77, 102, 28);
+    box-shadow: inset 1px 1px 1px rgb(77, 102, 28);
+}
+
+.dark {
+    background-color: rgb(45, 43, 43);
+    border-color: rgb(159, 159, 159);
+    box-shadow: inset 1px 1px 1px rgb(159, 159, 159);
+}
+
+.electric {
+    background-color: rgb(242, 242, 68);
+    border-color: rgb(105, 105, 2);
+    box-shadow: inset 1px 1px 1px rgb(105, 105, 2);
+    color: black; /* Mejoramos el contraste para el fondo amarillo */
+}
+
+/* ... y así sucesivamente con los demás tipos ... */
