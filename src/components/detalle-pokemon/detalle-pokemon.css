@@ -1,192 +1,512 @@
-.pokedex-container {
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:host {
+  display: block;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.detalle-wrapper {
   display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
-  padding: 2rem;
   font-family: 'Press Start 2P', cursive;
+  color: #fff;
+  background: #1a1a2e;
 }
 
-.pantallas-wrapper {
+/* panel izquierdo */
+.holo-panel {
+  width: 400px;
+  min-width: 320px;
   display: flex;
-  gap: 2rem;
-  max-width: 1000px;
-  width: 100%;
-  padding: 2rem;
-  border-radius: 20px;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 15px 30px rgba(0,0,0,0.4);
-  /* El color de fondo base lo dará la clase del tipo, ej. .fire */
-}
-
-.pantalla {
-  background-color: rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
-  padding: 1.5rem;
-  flex: 1; /* Ambas pantallas toman el mismo espacio */
-  border: 4px solid #333;
-}
-
-.header-pokemon {
-  display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 1rem;
+  padding: 2rem 1.5rem;
+  border-right: 3px solid rgba(255,255,255,0.15);
 }
 
-.imagen-principal-contenedor {
-  background-color: rgba(0,0,0,0.05);
-  border-radius: 10px;
-  height: 250px;
+/* colores segun el tipo del pokemon */
+.holo-panel.normal   { background: linear-gradient(160deg, #6d6d4e, #a8a878); }
+.holo-panel.fire     { background: linear-gradient(160deg, #9c531f, #f08030); }
+.holo-panel.water    { background: linear-gradient(160deg, #445e9c, #6890f0); }
+.holo-panel.electric { background: linear-gradient(160deg, #a1871f, #f8d030); }
+.holo-panel.grass    { background: linear-gradient(160deg, #4e8234, #78c850); }
+.holo-panel.ice      { background: linear-gradient(160deg, #638d8d, #98d8d8); }
+.holo-panel.fighting { background: linear-gradient(160deg, #7d1f1a, #c03028); }
+.holo-panel.poison   { background: linear-gradient(160deg, #682a68, #a040a0); }
+.holo-panel.ground   { background: linear-gradient(160deg, #927d44, #e0c068); }
+.holo-panel.flying   { background: linear-gradient(160deg, #6d5e9c, #a890f0); }
+.holo-panel.psychic  { background: linear-gradient(160deg, #a13959, #f85888); }
+.holo-panel.bug      { background: linear-gradient(160deg, #6d7815, #a8b820); }
+.holo-panel.rock     { background: linear-gradient(160deg, #786824, #b8a038); }
+.holo-panel.ghost    { background: linear-gradient(160deg, #493963, #705898); }
+.holo-panel.dragon   { background: linear-gradient(160deg, #4924a1, #7038f8); }
+.holo-panel.dark     { background: linear-gradient(160deg, #49392f, #705848); }
+.holo-panel.steel    { background: linear-gradient(160deg, #787887, #b8b8d0); }
+.holo-panel.fairy    { background: linear-gradient(160deg, #9b6470, #ee99ac); }
+
+.holo-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.holo-numero {
+  display: block;
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 0.5rem;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+}
+
+.holo-nombre {
+  font-size: 1.1rem;
+  margin: 0;
+  color: #fff;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+}
+
+/* el cuadro oscuro donde va la imagen con efecto holograma */
+.holo-stage {
+  position: relative;
+  width: 280px;
+  height: 320px;
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 1rem;
-  border: 2px inset #ccc;
+  background: #050510;
+  border-radius: 12px;
+  border: 2px solid rgba(0, 210, 255, 0.3);
+  overflow: hidden;
 }
 
-.img-animada {
-  height: 150px;
+.img-holograma {
+  width: 190px;
+  height: 190px;
   object-fit: contain;
-  filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.2));
+  position: relative;
+  z-index: 3;
+  filter:
+    hue-rotate(185deg)
+    saturate(3)
+    brightness(1.7)
+    drop-shadow(0 0 8px rgba(0, 210, 255, 1))
+    drop-shadow(0 0 20px rgba(0, 180, 255, 0.8))
+    drop-shadow(0 0 50px rgba(0, 120, 255, 0.5));
+  animation: flotar 3.5s ease-in-out infinite, glitch 8s ease-in-out infinite;
+  margin-bottom: 55px;
 }
 
-.btn-sonido {
-  width: 100%;
-  padding: 10px;
-  background-color: #4CAF50;
-  color: white;
-  border: 3px solid #2E7D32;
-  border-radius: 5px;
-  font-family: inherit;
-  font-size: 0.8rem;
-  cursor: pointer;
-  margin-bottom: 1rem;
+@keyframes flotar {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-14px); }
 }
 
-.btn-sonido:active {
-  transform: scale(0.98);
+/* animacion de glitch, aparece cada 8 segundos aprox */
+@keyframes glitch {
+  0%, 85%, 100% {
+    opacity: 1;
+    filter: hue-rotate(185deg) saturate(3) brightness(1.7)
+      drop-shadow(0 0 8px rgba(0,210,255,1))
+      drop-shadow(0 0 20px rgba(0,180,255,0.8))
+      drop-shadow(0 0 50px rgba(0,120,255,0.5));
+  }
+  87% {
+    opacity: 0.6;
+    filter: hue-rotate(200deg) saturate(4) brightness(2)
+      drop-shadow(3px 0 6px rgba(255,0,100,0.8))
+      drop-shadow(-3px 0 6px rgba(0,255,255,0.8));
+  }
+  89% { opacity: 1; }
+  91% { opacity: 0.5; transform: translateY(-14px) translateX(4px); }
+  93% { opacity: 1;   transform: translateY(-14px); }
 }
 
-.galeria {
+.scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 210, 255, 0.05) 2px,
+    rgba(0, 210, 255, 0.05) 4px
+  );
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* linea que baja de arriba a abajo simulando un escaneo */
+.scan-bar {
+  position: absolute;
+  left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0, 210, 255, 0.6) 30%,
+    rgba(0, 210, 255, 0.9) 50%,
+    rgba(0, 210, 255, 0.6) 70%,
+    transparent 100%);
+  z-index: 5;
+  animation: scanDown 3s linear infinite;
+  top: 0;
+}
+
+@keyframes scanDown {
+  0%   { top: 0%;   opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.holo-cone {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 240px;
+  background: linear-gradient(to top,
+    rgba(0, 210, 255, 0.18) 0%,
+    rgba(0, 210, 255, 0.06) 50%,
+    transparent 100%);
+  clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+  z-index: 1;
+}
+
+.holo-base {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 10px;
 }
 
-.galeria img {
-  width: 60px;
-  background-color: #eee;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+.holo-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 210, 255, 0.5);
+}
+
+.ring1 {
+  width: 60px; height: 16px;
+  box-shadow: 0 0 8px rgba(0, 210, 255, 0.4);
+  animation: ringPulse 2s ease-in-out infinite;
+}
+
+.ring2 {
+  width: 90px; height: 22px;
+  opacity: 0.35;
+  animation: ringPulse 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes ringPulse {
+  0%, 100% { transform: scaleX(1);    opacity: 0.8; }
+  50%       { transform: scaleX(1.1); opacity: 1; }
+}
+
+.holo-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: rgba(0, 210, 255, 1);
+  box-shadow: 0 0 8px rgba(0,210,255,1), 0 0 20px rgba(0,210,255,0.8), 0 0 40px rgba(0,150,255,0.6);
+  animation: dotPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.4); }
 }
 
 .tipos-contenedor {
   display: flex;
-  gap: 10px;
-  margin-bottom: 1.5rem;
+  gap: 8px;
+  margin-bottom: 1rem;
 }
 
 .etiqueta-tipo {
-  padding: 5px 10px;
-  border-radius: 5px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.55rem;
   color: white;
-  font-size: 0.7rem;
-  text-shadow: 1px 1px 0 #000;
-  border: 2px solid rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
+  border: 2px solid rgba(0,0,0,0.2);
+  font-weight: bold;
+}
+
+/* un color por cada tipo, son 18 en total */
+.etiqueta-tipo.normal   { background: #A8A878; }
+.etiqueta-tipo.fire     { background: #F08030; }
+.etiqueta-tipo.water    { background: #6890F0; }
+.etiqueta-tipo.electric { background: #F8D030; color: #333; }
+.etiqueta-tipo.grass    { background: #78C850; }
+.etiqueta-tipo.ice      { background: #98D8D8; color: #333; }
+.etiqueta-tipo.fighting { background: #C03028; }
+.etiqueta-tipo.poison   { background: #A040A0; }
+.etiqueta-tipo.ground   { background: #E0C068; color: #333; }
+.etiqueta-tipo.flying   { background: #A890F0; }
+.etiqueta-tipo.psychic  { background: #F85888; }
+.etiqueta-tipo.bug      { background: #A8B820; }
+.etiqueta-tipo.rock     { background: #B8A038; }
+.etiqueta-tipo.ghost    { background: #705898; }
+.etiqueta-tipo.dragon   { background: #7038F8; }
+.etiqueta-tipo.dark     { background: #705848; }
+.etiqueta-tipo.steel    { background: #B8B8D0; color: #333; }
+.etiqueta-tipo.fairy    { background: #EE99AC; color: #333; }
+
+.btn-sonido {
+  padding: 10px 18px;
+  background: rgba(0,0,0,0.25);
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.55rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background 0.2s;
+}
+
+.btn-sonido:hover {
+  background: rgba(0,0,0,0.45);
+}
+
+.galeria {
+  display: flex;
+  gap: 6px;
+}
+
+.galeria img {
+  width: 56px;
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  image-rendering: pixelated;
+}
+
+/* panel derecho con los datos */
+.datos-panel {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background: #f5f5f5;
+  color: #222;
 }
 
 .descripcion-caja {
-  background-color: #222;
-  color: #4CAF50;
-  padding: 1rem;
-  border-radius: 5px;
-  font-size: 0.8rem;
-  line-height: 1.5;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 1.2rem;
   margin-bottom: 1.5rem;
-  border: 3px inset #555;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.desc-label {
+  font-size: 0.5rem;
+  color: #888;
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.1em;
+}
+
+.descripcion-caja p {
+  font-size: 0.6rem;
+  line-height: 2;
+  color: #444;
+  margin: 0;
+}
+
+.seccion-titulo {
+  font-size: 0.6rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.stats-contenedor {
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .stat-fila {
   display: flex;
   align-items: center;
-  margin-bottom: 0.8rem;
-  font-size: 0.6rem;
+  gap: 10px;
+  margin-bottom: 0.7rem;
+  font-size: 0.5rem;
 }
 
 .stat-nombre {
-  width: 90px;
+  width: 80px;
+  color: #666;
+  flex-shrink: 0;
 }
 
 .stat-valor {
-  width: 40px;
+  width: 28px;
   text-align: right;
-  margin-right: 10px;
+  color: #222;
+  flex-shrink: 0;
 }
 
-/* Estilos de la barra de progreso */
-progress {
-  flex-grow: 1;
-  height: 12px;
-  -webkit-appearance: none;
+.stat-barra-bg {
+  flex: 1;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
-progress::-webkit-progress-bar {
-  background-color: #eee;
-  border-radius: 10px;
-  border: 1px solid #ccc;
+.stat-barra-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: #78C850;
+  transition: width 0.8s ease;
 }
 
-progress::-webkit-progress-value {
-  background-color: #4CAF50; /* Puedes cambiar esto para que coincida con el tipo */
-  border-radius: 10px;
-}
-
-/* ... (Tus estilos anteriores) ... */
+.stat-barra-fill.fire     { background: #F08030; }
+.stat-barra-fill.water    { background: #6890F0; }
+.stat-barra-fill.grass    { background: #78C850; }
+.stat-barra-fill.electric { background: #F8D030; }
+.stat-barra-fill.poison   { background: #A040A0; }
+.stat-barra-fill.psychic  { background: #F85888; }
+.stat-barra-fill.ghost    { background: #705898; }
+.stat-barra-fill.dragon   { background: #7038F8; }
+.stat-barra-fill.fighting { background: #C03028; }
+.stat-barra-fill.bug      { background: #A8B820; }
+.stat-barra-fill.normal   { background: #A8A878; }
+.stat-barra-fill.rock     { background: #B8A038; }
+.stat-barra-fill.ground   { background: #E0C068; }
+.stat-barra-fill.flying   { background: #A890F0; }
+.stat-barra-fill.ice      { background: #98D8D8; }
+.stat-barra-fill.dark     { background: #705848; }
+.stat-barra-fill.steel    { background: #B8B8D0; }
+.stat-barra-fill.fairy    { background: #EE99AC; }
 
 .evoluciones-contenedor {
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 2px dashed #ccc;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .evoluciones-lista {
   display: flex;
-  gap: 15px;
-  overflow-x: auto; /* Permite scroll horizontal si hay muchas evoluciones (ej. Eevee) */
-  padding-bottom: 10px;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.evo-grupo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.evo-flecha {
+  font-size: 0.6rem;
+  color: #bbb;
 }
 
 .evo-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: rgba(0,0,0,0.05);
-  padding: 10px;
+  padding: 8px;
   border-radius: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  min-width: 80px;
-  border: 2px solid transparent;
+  background: #f9f9f9;
+  border: 2px solid #e0e0e0;
+  transition: all 0.2s;
+  min-width: 70px;
 }
 
 .evo-item:hover {
-  background-color: rgba(0,0,0,0.1);
+  background: #eef;
+  border-color: #aac;
   transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .evo-item img {
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
+  image-rendering: pixelated;
 }
 
 .evo-item span {
-  font-size: 0.6rem;
-  margin-top: 5px;
+  font-size: 0.4rem;
+  color: #555;
+  margin-top: 4px;
+  text-align: center;
 }
 
-/* Resalta el Pokémon que estamos viendo actualmente en la lista */
+/* el pokemon que estas viendo actualmente se marca diferente */
 .pokemon-actual {
-  background-color: rgba(76, 175, 80, 0.2);
-  border-color: #4CAF50;
-  pointer-events: none; /* Evita que el usuario haga clic en el Pokémon en el que ya está */
+  border-color: #78C850;
+  background: rgba(120, 200, 80, 0.1);
+  pointer-events: none;
+}
+
+.pokemon-actual span { color: #4e8234; }
+
+.btn-regresar {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 100;
+  padding: 8px 14px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.5rem;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  transition: all 0.2s;
+}
+
+.btn-regresar:hover {
+  background: rgba(0,0,0,0.85);
+  transform: translateX(-2px);
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  min-height: 100vh;
+  background: #1a1a2e;
+}
+
+.loading-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #78C850;
+  animation: blink 1.2s ease-in-out infinite;
+}
+
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blink {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50%       { opacity: 1;   transform: scale(1.2); }
 }

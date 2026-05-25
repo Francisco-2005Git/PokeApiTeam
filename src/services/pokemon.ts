@@ -6,41 +6,25 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class PokemonService {
-  
-  // Guardamos la URL base para no repetirla
-  private baseUrl = 'https://pokeapi.co/api/v2';
 
-  // Inyectamos HttpClient en el constructor
+  private url = 'https://pokeapi.co/api/v2';
+
   constructor(private http: HttpClient) { }
 
-  /**
-   * Obtiene la lista inicial de Pokémon (solo nombres y URLs)
-   * @param limit Cantidad de Pokémon a traer (ej. 20)
-   * @param offset Desde dónde empezar a contar (ej. 0)
-   */
+  // trae la lista de pokemon con limite y desde donde empezar
   getPokemonList(limit: number = 20, offset: number = 0): Observable<any> {
-    return this.http.get(`${this.baseUrl}/pokemon?limit=${limit}&offset=${offset}`);
+    return this.http.get(`${this.url}/pokemon?limit=${limit}&offset=${offset}`);
   }
 
-  /**
-   * Obtiene todos los detalles de un Pokémon específico
-   * @param nameOrId El nombre o número de Pokédex del Pokémon
-   */
   getPokemonDetails(nameOrId: string | number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/pokemon/${nameOrId}`);
+    return this.http.get(`${this.url}/pokemon/${nameOrId}`);
   }
 
-  /**
-   * Obtiene la descripción (flavor text) y la URL de la cadena evolutiva
-   * @param nameOrId El nombre o número de Pokédex
-   */
+  // esto trae la descripcion y la url de la cadena evolutiva
   getPokemonSpecies(nameOrId: string | number): Observable<any> {
-    return this.http.get(`${this.baseUrl}/pokemon-species/${nameOrId}`);
+    return this.http.get(`${this.url}/pokemon-species/${nameOrId}`);
   }
-  /**
-   * Obtiene la cadena evolutiva a partir de la URL proporcionada por species
-   * @param url La URL completa de la cadena evolutiva
-   */
+
   getEvolutionChain(url: string): Observable<any> {
     return this.http.get(url);
   }

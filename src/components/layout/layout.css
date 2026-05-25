@@ -1,0 +1,23 @@
+.app-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: #111;
+}
+
+.panel-lista {
+  width: 400px;
+  min-width: 300px;
+  overflow-y: auto;
+  border-right: 3px solid #333;
+  scrollbar-width: thin;
+  scrollbar-color: #444 #111;
+}
+
+.panel-detalle {
+  flex: 1;
+  overflow-y: auto;
+  background: #1a1a1a;
+  scrollbar-width: thin;
+  scrollbar-color: #444 #1a1a1a;
+}

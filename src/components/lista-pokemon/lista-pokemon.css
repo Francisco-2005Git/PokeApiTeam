@@ -1,8 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
 .contenedor-principal {
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
-  font-family: 'Press Start 2P', cursive; /* Tu fuente retro */
+  font-family: 'Press Start 2P', cursive;
 }
 
 .titulo-pokedex {
@@ -12,15 +18,14 @@
   margin-bottom: 2rem;
 }
 
-/* Magia de CSS Grid: Crea columnas responsivas automáticamente */
 .pokedex-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 1.5rem;
+  align-items: start;
 }
 
-/* Estilo base de la tarjeta */
-.tarjeta {
+.grupo-evolutivo {
   border-radius: 15px;
   padding: 1rem;
   cursor: pointer;
@@ -28,12 +33,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* El borde y fondo lo dará la clase [ngClass] (ej. .fire, .grass) */
+  overflow: hidden;
 }
 
-.tarjeta:hover {
-  transform: translateY(-5px); /* Efecto de saltito al pasar el mouse */
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+.grupo-evolutivo:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+}
+
+.tarjeta-base {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  text-decoration: none;
 }
 
 .tarjeta-header {
@@ -42,7 +55,7 @@
 }
 
 .id-pokemon {
-  background-color: rgba(0,0,0,0.2);
+  background-color: rgba(0, 0, 0, 0.2);
   padding: 3px 8px;
   border-radius: 10px;
   font-size: 0.7rem;
@@ -54,20 +67,159 @@
   height: 120px;
   object-fit: contain;
   margin: 10px 0;
-  filter: drop-shadow(2px 2px 5px rgba(0,0,0,0.5)); /* Sombra para que resalte del fondo */
+  filter: drop-shadow(2px 2px 5px rgba(0, 0, 0, 0.5));
+  transition: transform 0.3s ease;
+}
+
+.grupo-evolutivo:hover .pokemon-img {
+  transform: scale(1.08);
 }
 
 .nombre-pokemon {
   color: white;
   font-size: 1rem;
-  margin: 10px 0;
-  text-shadow: 1px 1px 0px rgba(0,0,0,0.5);
+  margin: 8px 0 4px;
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.5);
 }
 
 .etiqueta-tipo {
-  background-color: rgba(255,255,255,0.3);
+  background-color: rgba(255, 255, 255, 0.3);
   color: white;
   padding: 5px 10px;
   border-radius: 20px;
   font-size: 0.6rem;
 }
+
+.hint-evo {
+  margin-top: 8px;
+  font-size: 0.45rem;
+  color: rgba(255, 255, 255, 0.75);
+  letter-spacing: 0.05em;
+  transition: opacity 0.2s ease;
+}
+
+.grupo-evolutivo:hover .hint-evo {
+  opacity: 0;
+}
+
+/* panel de evoluciones que aparece al hacer hover */
+.evoluciones-panel {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.45s ease, opacity 0.35s ease, padding 0.35s ease;
+}
+
+.grupo-evolutivo:hover .evoluciones-panel {
+  max-height: 500px;
+  opacity: 1;
+  padding-top: 0.75rem;
+}
+
+.evo-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  min-width: 70px;
+}
+
+.evo-card:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+}
+
+.evo-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.4));
+}
+
+.evo-nombre {
+  color: white;
+  font-size: 0.45rem;
+  text-align: center;
+  margin-top: 4px;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.evo-id {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.4rem;
+  margin-top: 2px;
+}
+
+/* elemento invisible al fondo que dispara la carga de mas pokemon */
+.sentinel {
+  width: 100%;
+  padding: 2.5rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px;
+}
+
+.cargando {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.cargando-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff0000;
+  animation: pulsoDot 1.2s ease-in-out infinite;
+}
+
+.cargando-dot:nth-child(2) { animation-delay: 0.2s; }
+.cargando-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulsoDot {
+  0%, 100% { opacity: 0.25; transform: scale(0.7); }
+  50%       { opacity: 1;    transform: scale(1.2); }
+}
+
+.fin-lista {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.5rem;
+  color: #555;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+/* cuando una tarjeta se desmonta del dom, este div ocupa su lugar */
+.grupo-placeholder {
+  width: 100%;
+}
+
+/* colores por tipo, son los oficiales del juego */
+.normal   { background-color: #A8A878; border: 3px solid #6D6D4E; }
+.fire     { background-color: #F08030; border: 3px solid #9C531F; }
+.water    { background-color: #6890F0; border: 3px solid #445E9C; }
+.electric { background-color: #F8D030; border: 3px solid #A1871F; }
+.grass    { background-color: #78C850; border: 3px solid #4E8234; }
+.ice      { background-color: #98D8D8; border: 3px solid #638D8D; }
+.fighting { background-color: #C03028; border: 3px solid #7D1F1A; }
+.poison   { background-color: #A040A0; border: 3px solid #682A68; }
+.ground   { background-color: #E0C068; border: 3px solid #927D44; }
+.flying   { background-color: #A890F0; border: 3px solid #6D5E9C; }
+.psychic  { background-color: #F85888; border: 3px solid #A13959; }
+.bug      { background-color: #A8B820; border: 3px solid #6D7815; }
+.rock     { background-color: #B8A038; border: 3px solid #786824; }
+.ghost    { background-color: #705898; border: 3px solid #493963; }
+.dragon   { background-color: #7038F8; border: 3px solid #4924A1; }
+.dark     { background-color: #705848; border: 3px solid #49392F; }
+.steel    { background-color: #B8B8D0; border: 3px solid #787887; }
+.fairy    { background-color: #EE99AC; border: 3px solid #9B6470; }

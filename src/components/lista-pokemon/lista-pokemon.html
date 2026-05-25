@@ -1,26 +1,56 @@
 <div class="contenedor-principal">
   <h1 class="titulo-pokedex">Pokédex Nacional</h1>
 
-  <!-- Cuadrícula de Pokémon -->
   <div class="pokedex-grid">
-    
-    <!-- La directiva *ngFor repite este bloque por cada Pokémon -->
-    <div *ngFor="let p of listaPokemon" class="tarjeta tipo-pokemon" [ngClass]="p.tipoPrincipal"[routerLink]="['/pokemon', p.id]">
-      
-      <div class="tarjeta-header">
-        <span class="id-pokemon">#{{ p.id }}</span>
-      </div>
-      
-      <img [src]="p.imagen" [alt]="p.nombre" class="pokemon-img">
-      
-      <!-- El pipe titlecase pone la primera letra en mayúscula automáticamente -->
-      <h3 class="nombre-pokemon">{{ p.nombre | titlecase }}</h3>
-      
-      <div class="etiqueta-tipo">
-        {{ p.tipoPrincipal | uppercase }}
-      </div>
-      
-    </div>
+    @for (grupo of grupos; track grupo.base.id; let i = $index) {
 
+      <div class="grupo-evolutivo" [ngClass]="grupo.base.tipo" [attr.data-index]="i">
+
+        @if (grupo.visible) {
+
+          <div class="tarjeta-base" [routerLink]="['/pokemon', grupo.base.id]">
+            <div class="tarjeta-header">
+              <span class="id-pokemon">#{{ grupo.base.id }}</span>
+            </div>
+            <img [src]="grupo.base.imagen" [alt]="grupo.base.nombre" class="pokemon-img">
+            <h3 class="nombre-pokemon">{{ grupo.base.nombre | titlecase }}</h3>
+            <div class="etiqueta-tipo">{{ grupo.base.tipo | uppercase }}</div>
+
+            @if (grupo.evoluciones.length > 1) {
+              <div class="hint-evo">▼ {{ grupo.evoluciones.length - 1 }} evolución(es)</div>
+            }
+          </div>
+
+          @if (grupo.evoluciones.length > 1) {
+            <div class="evoluciones-panel">
+              @for (evo of grupo.evoluciones; track evo.id) {
+                <div class="evo-card" [routerLink]="['/pokemon', evo.id]">
+                  <img [src]="evo.imagen" [alt]="evo.nombre" class="evo-img">
+                  <span class="evo-nombre">{{ evo.nombre | titlecase }}</span>
+                  <span class="evo-id">#{{ evo.id }}</span>
+                </div>
+              }
+            </div>
+          }
+
+        } @else {
+          <div class="grupo-placeholder" [style.height.px]="grupo.alto"></div>
+        }
+
+      </div>
+    }
+  </div>
+
+  <div #sentinel class="sentinel">
+    @if (loading) {
+      <div class="cargando">
+        <div class="cargando-dot"></div>
+        <div class="cargando-dot"></div>
+        <div class="cargando-dot"></div>
+      </div>
+    }
+    @if (!hayMas && grupos.length > 0) {
+      <p class="fin-lista">— Fin de la Pokédex —</p>
+    }
   </div>
 </div>

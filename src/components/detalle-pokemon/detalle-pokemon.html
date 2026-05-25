@@ -1,76 +1,83 @@
-<!-- Solo mostramos la tarjeta si ya cargaron los datos -->
-<div class="pokedex-container" *ngIf="pokemon">
-  
-  <!-- Usamos ngClass para pintar el fondo según el tipo -->
-  <div class="pantallas-wrapper" [ngClass]="tipoPrincipal">
-    
-    <!-- PANTALLA IZQUIERDA: Visuales y Audio -->
-    <div class="pantalla visuales">
-      <div class="header-pokemon">
-        <h2>{{ pokemon.name | titlecase }}</h2>
-        <span>#{{ pokemon.id }}</span>
-      </div>
+<div class="detalle-wrapper" *ngIf="pokemon">
 
-      <!-- El Sprite Animado 3D/Showdown -->
-      <div class="imagen-principal-contenedor">
-        <img 
-          [src]="pokemon.sprites.other.showdown.front_default || pokemon.sprites.other['official-artwork'].front_default" 
-          [alt]="pokemon.name" 
-          class="img-animada">
-      </div>
+  <a class="btn-regresar" [routerLink]="['/']">Volver</a>
 
-      <button class="btn-sonido" (click)="reproducirGrito()">
-        🔊 Reproducir Grito
-      </button>
+  <div class="holo-panel" [ngClass]="tipo">
 
-      <!-- Galería -->
-      <div class="galeria">
-        <img *ngFor="let img of galeria" [src]="img" alt="Sprite">
+    <div class="holo-header">
+      <span class="holo-numero">#{{ pokemon.id }}</span>
+      <h2 class="holo-nombre">{{ pokemon.name | titlecase }}</h2>
+    </div>
+
+    <div class="holo-stage">
+      <img
+        [src]="pokemon.sprites.other['official-artwork'].front_default"
+        [alt]="pokemon.name"
+        class="img-holograma">
+      <div class="scanlines"></div>
+      <div class="scan-bar"></div>
+      <div class="holo-cone"></div>
+      <div class="holo-base">
+        <div class="holo-ring ring1"></div>
+        <div class="holo-ring ring2"></div>
+        <div class="holo-dot"></div>
       </div>
     </div>
 
-    <!-- PANTALLA DERECHA: Datos y Estadísticas -->
-    <div class="pantalla info">
-      <div class="tipos-contenedor">
-        <span *ngFor="let tipo of pokemon.types" class="etiqueta-tipo" [ngClass]="tipo.type.name">
-          {{ tipo.type.name | uppercase }}
-        </span>
-      </div>
+    <div class="tipos-contenedor">
+      <span *ngFor="let t of pokemon.types" class="etiqueta-tipo" [ngClass]="t.type.name">
+        {{ t.type.name | uppercase }}
+      </span>
+    </div>
 
-      <div class="descripcion-caja">
-        <p>{{ descripcion }}</p>
-      </div>
+    <button class="btn-sonido" (click)="reproducirGrito()">Reproducir Grito</button>
 
-      <div class="stats-contenedor">
-        <h3>Estadísticas Base</h3>
-        
-        <div class="stat-fila" *ngFor="let stat of pokemon.stats">
-          <span class="stat-nombre">{{ stat.stat.name | uppercase }}</span>
-          <span class="stat-valor">{{ stat.base_stat }}</span>
-          
-          <!-- Barra de progreso para el stat (máximo 255) -->
-          <progress max="255" [value]="stat.base_stat" [ngClass]="tipoPrincipal"></progress>
+    <div class="galeria" *ngIf="galeria.length > 0">
+      <img *ngFor="let img of galeria" [src]="img" alt="Sprite">
+    </div>
+
+  </div>
+
+  <div class="datos-panel">
+
+    <div class="descripcion-caja">
+      <div class="desc-label">Entrada Pokédex</div>
+      <p>{{ descripcion }}</p>
+    </div>
+
+    <div class="stats-contenedor">
+      <h3 class="seccion-titulo">Estadísticas Base</h3>
+      <div class="stat-fila" *ngFor="let stat of pokemon.stats">
+        <span class="stat-nombre">{{ stat.stat.name | uppercase }}</span>
+        <span class="stat-valor">{{ stat.base_stat }}</span>
+        <div class="stat-barra-bg">
+          <div class="stat-barra-fill" [ngClass]="tipo"
+               [style.width.%]="(stat.base_stat / 255) * 100"></div>
         </div>
       </div>
-      <!-- NUEVO: Sección de Evoluciones -->
-      <div class="evoluciones-contenedor" *ngIf="evoluciones.length > 1">
-        <h3>Cadena Evolutiva</h3>
-        
-        <div class="evoluciones-lista">
-          <div *ngFor="let evo of evoluciones" 
-               class="evo-item" 
+    </div>
+
+    <div class="evoluciones-contenedor" *ngIf="evoluciones.length > 1">
+      <h3 class="seccion-titulo">Cadena Evolutiva</h3>
+      <div class="evoluciones-lista">
+        <div *ngFor="let evo of evoluciones; let i = index" class="evo-grupo">
+          <div class="evo-item"
                [ngClass]="{'pokemon-actual': evo.id === pokemon.id.toString()}"
                [routerLink]="['/pokemon', evo.id]">
-            
-            <!-- Usamos la URL directa de la imagen usando el ID para no hacer otra petición HTTP -->
-            <img [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + evo.id + '.png'" 
+            <img [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + evo.id + '.png'"
                  [alt]="evo.nombre">
             <span>{{ evo.nombre | titlecase }}</span>
-            
           </div>
+          <span class="evo-flecha" *ngIf="i < evoluciones.length - 1">▶</span>
         </div>
       </div>
     </div>
 
   </div>
+</div>
+
+<div class="loading" *ngIf="!pokemon">
+  <div class="loading-dot"></div>
+  <div class="loading-dot"></div>
+  <div class="loading-dot"></div>
 </div>
