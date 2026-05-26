@@ -223,3 +223,26 @@
 .dark     { background-color: #705848; border: 3px solid #49392F; }
 .steel    { background-color: #B8B8D0; border: 3px solid #787887; }
 .fairy    { background-color: #EE99AC; border: 3px solid #9B6470; }
+
+
+/* Botón retro duro */
+.btn-retro-duro {
+  background-color: #333;
+  color: white;
+  border: 3px solid #000;
+  border-radius: 5px;
+  box-shadow: inset 2px 2px 5px rgba(255,255,255,0.2), 3px 3px 0 #000;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.btn-retro-duro:hover { background-color: #444; }
+.btn-retro-duro:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+
+/* Cajas de datos retro */
+.caja-datos-retro {
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 3px solid #333;
+  border-radius: 8px;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+  margin-bottom: 1.5rem;
+}
