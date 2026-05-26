@@ -1,51 +1,57 @@
 <div class="detalle-wrapper" *ngIf="pokemon">
 
-  <a class="btn-regresar" [routerLink]="['/']">Volver</a>
+  <a class="btn-regresar btn-retro-duro" [routerLink]="['/']">Volver</a>
 
   <div class="holo-panel" [ngClass]="tipo">
 
-    <div class="holo-header">
-      <span class="holo-numero">#{{ pokemon.id }}</span>
-      <h2 class="holo-nombre">{{ pokemon.name | titlecase }}</h2>
+    <div 
+      class="fondo-region" 
+      *ngIf="regionBackgroundImageUrl" 
+      [style.background-image]="'url(' + regionBackgroundImageUrl + ')'">
     </div>
 
-    <div class="holo-stage">
-      <img
-        [src]="pokemon.sprites.other['official-artwork'].front_default"
-        [alt]="pokemon.name"
-        class="img-holograma">
-      <div class="scanlines"></div>
-      <div class="scan-bar"></div>
-      <div class="holo-cone"></div>
-      <div class="holo-base">
-        <div class="holo-ring ring1"></div>
-        <div class="holo-ring ring2"></div>
-        <div class="holo-dot"></div>
+    <div class="holo-contenido">
+      <div class="holo-header">
+        <span class="holo-numero">#{{ pokemon.id }}</span>
+        <h2 class="holo-nombre">{{ pokemon.name | titlecase }}</h2>
       </div>
-    </div>
 
-    <div class="tipos-contenedor">
-      <span *ngFor="let t of pokemon.types" class="etiqueta-tipo" [ngClass]="t.type.name">
-        {{ t.type.name | uppercase }}
-      </span>
-    </div>
+      <div class="holo-stage">
+        <img
+          [src]="pokemon.sprites.other['official-artwork'].front_default"
+          [alt]="pokemon.name"
+          class="img-holograma">
+        <div class="scanlines"></div>
+        <div class="scan-bar"></div>
+        <div class="holo-cone"></div>
+        <div class="holo-base">
+          <div class="holo-ring ring1"></div>
+          <div class="holo-ring ring2"></div>
+          <div class="holo-dot"></div>
+        </div>
+      </div>
 
-    <button class="btn-sonido" (click)="reproducirGrito()">Reproducir Grito</button>
+      <div class="tipos-contenedor">
+        <span *ngFor="let t of pokemon.types" class="etiqueta-tipo" [ngClass]="t.type.name">
+          {{ t.type.name | uppercase }}
+        </span>
+      </div>
 
-    <div class="galeria" *ngIf="galeria.length > 0">
-      <img *ngFor="let img of galeria" [src]="img" alt="Sprite">
-    </div>
+      <button class="btn-sonido btn-retro-duro" (click)="reproducirGrito()">Reproducir Grito</button>
 
-  </div>
+      <div class="galeria" *ngIf="galeria.length > 0">
+        <img *ngFor="let img of galeria" [src]="img" alt="Sprite">
+      </div>
+    </div> </div>
 
   <div class="datos-panel">
 
-    <div class="descripcion-caja">
+    <div class="descripcion-caja caja-datos-retro">
       <div class="desc-label">Entrada Pokédex</div>
       <p>{{ descripcion }}</p>
     </div>
 
-    <div class="stats-contenedor">
+    <div class="stats-contenedor caja-datos-retro">
       <h3 class="seccion-titulo">Estadísticas Base</h3>
       <div class="stat-fila" *ngFor="let stat of pokemon.stats">
         <span class="stat-nombre">{{ stat.stat.name | uppercase }}</span>
@@ -57,7 +63,7 @@
       </div>
     </div>
 
-    <div class="evoluciones-contenedor" *ngIf="evoluciones.length > 1">
+    <div class="evoluciones-contenedor caja-datos-retro" *ngIf="evoluciones.length > 1">
       <h3 class="seccion-titulo">Cadena Evolutiva</h3>
       <div class="evoluciones-lista">
         <div *ngFor="let evo of evoluciones; let i = index" class="evo-grupo">

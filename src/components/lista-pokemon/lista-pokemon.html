@@ -1,56 +1,83 @@
 <div class="contenedor-principal">
   <h1 class="titulo-pokedex">Pokédex Nacional</h1>
 
-  <div class="pokedex-grid">
-    @for (grupo of grupos; track grupo.base.id; let i = $index) {
+  <div class="barra-busqueda-contenedor">
+    <input 
+      type="search" 
+      placeholder="Buscar por nombre o ID (ej. 25 o Pikachu)" 
+      [(ngModel)]="terminoBusqueda" 
+      class="input-busqueda"
+      (keyup.enter)="buscarPokemon()">
+    <button class="btn-busqueda btn-retro-duro" (click)="buscarPokemon()">Buscar</button>
+  </div>
 
-      <div class="grupo-evolutivo" [ngClass]="grupo.base.tipo" [attr.data-index]="i">
+  <div class="pokedex-layout">
+    
+    <div class="panel-generaciones caja-datos-retro">
+      <h3>Pokémon por Generación</h3>
+      <ul>
+        @for (conteo of conteosGeneracion | keyvalue; track conteo.key) {
+          <li class="item-generacion">
+            <span class="nombre-generacion">{{ conteo.key }}</span>
+            <span class="valor-generacion">{{ conteo.value }}</span>
+          </li>
+        }
+      </ul>
+    </div>
 
-        @if (grupo.visible) {
+    <div class="grid-wrapper" style="flex: 1;">
+      
+      <div class="pokedex-grid">
+        @for (grupo of grupos; track grupo.base.id; let i = $index) {
 
-          <div class="tarjeta-base" [routerLink]="['/pokemon', grupo.base.id]">
-            <div class="tarjeta-header">
-              <span class="id-pokemon">#{{ grupo.base.id }}</span>
-            </div>
-            <img [src]="grupo.base.imagen" [alt]="grupo.base.nombre" class="pokemon-img">
-            <h3 class="nombre-pokemon">{{ grupo.base.nombre | titlecase }}</h3>
-            <div class="etiqueta-tipo">{{ grupo.base.tipo | uppercase }}</div>
+          <div class="grupo-evolutivo" [ngClass]="grupo.base.tipo" [attr.data-index]="i">
 
-            @if (grupo.evoluciones.length > 1) {
-              <div class="hint-evo">▼ {{ grupo.evoluciones.length - 1 }} evolución(es)</div>
-            }
-          </div>
+            @if (grupo.visible) {
 
-          @if (grupo.evoluciones.length > 1) {
-            <div class="evoluciones-panel">
-              @for (evo of grupo.evoluciones; track evo.id) {
-                <div class="evo-card" [routerLink]="['/pokemon', evo.id]">
-                  <img [src]="evo.imagen" [alt]="evo.nombre" class="evo-img">
-                  <span class="evo-nombre">{{ evo.nombre | titlecase }}</span>
-                  <span class="evo-id">#{{ evo.id }}</span>
+              <div class="tarjeta-base" [routerLink]="['/pokemon', grupo.base.id]">
+                <div class="tarjeta-header">
+                  <span class="id-pokemon">#{{ grupo.base.id }}</span>
+                </div>
+                <img [src]="grupo.base.imagen" [alt]="grupo.base.nombre" class="pokemon-img">
+                <h3 class="nombre-pokemon">{{ grupo.base.nombre | titlecase }}</h3>
+                <div class="etiqueta-tipo">{{ grupo.base.tipo | uppercase }}</div>
+
+                @if (grupo.evoluciones.length > 1) {
+                  <div class="hint-evo">▼ {{ grupo.evoluciones.length - 1 }} evolución(es)</div>
+                }
+              </div>
+
+              @if (grupo.evoluciones.length > 1) {
+                <div class="evoluciones-panel">
+                  @for (evo of grupo.evoluciones; track evo.id) {
+                    <div class="evo-card" [routerLink]="['/pokemon', evo.id]">
+                      <img [src]="evo.imagen" [alt]="evo.nombre" class="evo-img">
+                      <span class="evo-nombre">{{ evo.nombre | titlecase }}</span>
+                      <span class="evo-id">#{{ evo.id }}</span>
+                    </div>
+                  }
                 </div>
               }
-            </div>
-          }
 
-        } @else {
-          <div class="grupo-placeholder" [style.height.px]="grupo.alto"></div>
+            } @else {
+              <div class="grupo-placeholder" [style.height.px]="grupo.alto"></div>
+            }
+
+          </div>
         }
-
       </div>
-    }
-  </div>
 
-  <div #sentinel class="sentinel">
-    @if (loading) {
-      <div class="cargando">
-        <div class="cargando-dot"></div>
-        <div class="cargando-dot"></div>
-        <div class="cargando-dot"></div>
+      <div #sentinel class="sentinel">
+        @if (loading) {
+          <div class="cargando">
+            <div class="cargando-dot"></div>
+            <div class="cargando-dot"></div>
+            <div class="cargando-dot"></div>
+          </div>
+        }
+        @if (!hayMas && grupos.length > 0) {
+          <p class="fin-lista">— Fin de la Pokédex —</p>
+        }
       </div>
-    }
-    @if (!hayMas && grupos.length > 0) {
-      <p class="fin-lista">— Fin de la Pokédex —</p>
-    }
-  </div>
-</div>
+
+    </div> </div> </div>

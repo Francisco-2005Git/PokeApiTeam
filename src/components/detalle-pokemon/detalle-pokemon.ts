@@ -16,6 +16,9 @@ export class DetallePokemon implements OnInit {
   tipo: string = '';
   evoluciones: any[] = [];
 
+  // NUEVO: Variable para la URL de la imagen de fondo de la región
+  regionBackgroundImageUrl: string = '';
+
   constructor(
     private route: ActivatedRoute,
     private pokemonService: PokemonService,
@@ -31,6 +34,10 @@ export class DetallePokemon implements OnInit {
         this.pokemon = null;
         this.evoluciones = [];
         this.descripcion = '';
+        
+        // NUEVO: Limpiamos la imagen anterior al cambiar de Pokémon
+        this.regionBackgroundImageUrl = ''; 
+        
         this.cdr.detectChanges();
         this.cargarDatos(id);
       }
@@ -61,6 +68,9 @@ export class DetallePokemon implements OnInit {
         ? txt.flavor_text.replace(/\f|\n/g, ' ')
         : 'Sin descripción.';
 
+      // NUEVO: Determinamos la región basada en el ID y establecemos la imagen de fondo
+      this.establecerImagenFondoRegion(especie.id);
+
       this.pokemonService.getEvolutionChain(especie.evolution_chain.url).subscribe(data => {
         this.procesarEvoluciones(data.chain);
         this.cdr.detectChanges();
@@ -86,5 +96,36 @@ export class DetallePokemon implements OnInit {
       audio.volume = 0.5;
       audio.play();
     }
+  }
+
+  // NUEVO: Función para determinar la región y establecer la imagen de fondo
+  establecerImagenFondoRegion(id: number): void {
+    // Mapeamos las regiones a las imágenes en tu carpeta assets
+    const mapRegiones: { [key: string]: string } = {
+      'Kanto': 'assets/regions/kanto_bg.png',
+      'Johto': 'assets/regions/johto_bg.png',
+      'Hoenn': 'assets/regions/hoenn_bg.png',
+      'Sinnoh': 'assets/regions/sinnoh_bg.png',
+      'Unova': 'assets/regions/unova_bg.png',
+      'Kalos': 'assets/regions/kalos_bg.png',
+      'Alola': 'assets/regions/alola_bg.png',
+      'Galar': 'assets/regions/galar_bg.png',
+      'Paldea': 'assets/regions/paldea_bg.png'
+    };
+    
+    let region = '';
+    // Mantenemos la lógica de rangos que diseñaste
+    if (id >= 1 && id <= 151) region = 'Kanto';
+    else if (id >= 152 && id <= 251) region = 'Johto';
+    else if (id >= 252 && id <= 386) region = 'Hoenn';
+    else if (id >= 387 && id <= 493) region = 'Sinnoh';
+    else if (id >= 494 && id <= 649) region = 'Unova';
+    else if (id >= 650 && id <= 721) region = 'Kalos';
+    else if (id >= 722 && id <= 809) region = 'Alola';
+    else if (id >= 810 && id <= 905) region = 'Galar';
+    else if (id >= 906 && id <= 1025) region = 'Paldea';
+    
+    // Asignamos la URL
+    this.regionBackgroundImageUrl = mapRegiones[region] || '';
   }
 }
