@@ -246,3 +246,25 @@
   box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
   margin-bottom: 1.5rem;
 }
+
+/* Regiones */
+.pokxgen{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+}
+.item-generacion {
+  display: inline-block;
+  padding: 20px;
+  width: 350px;
+  background-color: #f54545;
+  color: white;
+  border: 3px solid #000;
+  border-radius: 5px;
+  box-shadow: inset 2px 2px 5px rgba(241, 56, 56, 0.2), 3px 3px 0 #000;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.item-generacion:hover { background-color: #fd2323; }
+.item-generacion:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }

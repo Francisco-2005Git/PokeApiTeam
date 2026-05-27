@@ -14,12 +14,11 @@
   <div class="pokedex-layout">
     
     <div class="panel-generaciones caja-datos-retro">
-      <h3>Pokémon por Generación</h3>
+      <h3 class="pokxgen">Pokémon por Generación</h3>
       <ul>
         @for (conteo of conteosGeneracion | keyvalue; track conteo.key) {
           <li class="item-generacion" [ngClass]="conteo.key" >
-            <span class="nombre-generacion" [routerLink]="['/generacion', conteo.key]">{{ conteo.key }}</span>
-            <span class="valor-generacion">{{ conteo.value }}</span>
+            <span class="nombre-generacion" [routerLink]="['/generacion', conteo.key]">{{ conteo.key }} <span class="valor-generacion">{{ conteo.value }}</span></span>
           </li>
         }
       </ul>
