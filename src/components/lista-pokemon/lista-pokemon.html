@@ -17,8 +17,8 @@
       <h3 class="pokxgen">Pokémon por Generación</h3>
       <ul>
         @for (conteo of conteosGeneracion | keyvalue; track conteo.key) {
-          <li class="item-generacion" [ngClass]="conteo.key" >
-            <span class="nombre-generacion" [routerLink]="['/generacion', conteo.key]">{{ conteo.key }} <span class="valor-generacion">{{ conteo.value }}</span></span>
+          <li class="item-generacion" [ngClass]="conteo.key" [routerLink]="['/generacion', conteo.key]">
+            <span class="nombre-generacion" >{{ conteo.key }} <span class="valor-generacion">{{ conteo.value }}</span></span>
           </li>
         }
       </ul>
