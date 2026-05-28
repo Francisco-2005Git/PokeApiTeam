@@ -51,7 +51,7 @@ export class FiltroRegiones implements OnInit, AfterViewInit, OnDestroy {
   };
 
   private offset = 0;
-  private readonly LIMITE = 20;
+  private readonly LIMITE = 156;
 
   private yaRegistrados = new Set<number>();
   private obsCentinela!: IntersectionObserver;

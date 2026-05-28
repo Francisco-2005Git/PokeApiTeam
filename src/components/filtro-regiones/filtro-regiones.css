@@ -246,3 +246,25 @@
   box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
   margin-bottom: 1.5rem;
 }
+
+.btn-regresar {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 100;
+  padding: 8px 14px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 8px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.5rem;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  transition: all 0.2s;
+}
+
+.btn-regresar:hover {
+  background: rgba(0,0,0,0.85);
+  transform: translateX(-2px);
+}
