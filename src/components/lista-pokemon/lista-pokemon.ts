@@ -4,7 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { NgClass, TitleCasePipe, UpperCasePipe, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable, of } from 'rxjs';
-import { switchMap, map, catchError } from 'rxjs/operators';
+import { switchMap, map, catchError, of } from 'rxjs/operators';
 
 interface GrupoEvolutivo {
   base: {
@@ -15,6 +15,7 @@ interface GrupoEvolutivo {
     urlCadena: string;
   };
   evoluciones: any[];
+  idsCadena: number[];
   visible: boolean;
   alto: number; // guardamos esto antes de quitar el elemento del dom
 }
@@ -253,13 +254,67 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
               urlCadena: item.especie.evolution_chain.url
             }));
 
-          this.agrupar(lista);
-          this.offset += this.LIMITE;
-          this.loading = false;
-          this.cdr.detectChanges();
+          // URLs únicas de cadenas evolutivas en este lote
+        const urlsUnicas = [...new Set(lista.map((p: any) => p.urlCadena))] as string[];
 
-          setTimeout(() => this.registrarNuevos(inicio), 0);
-          setTimeout(() => this.revisarSentinel(), 150);
+        const llamadasCadenas: Observable<any>[] = urlsUnicas.map((url: string) =>
+          this.pokemonService.getEvolutionChain(url)
+        );
+
+        forkJoin(llamadasCadenas).subscribe((cadenas: any[]) => {
+          const mapaIds = new Map<string, number[]>();
+          for (let i = 0; i < urlsUnicas.length; i++) {
+            mapaIds.set(urlsUnicas[i], this.extraerIds(cadenas[i].chain));
+          }
+
+          // IDs que pertenecen a estas cadenas pero NO están en el lote actual
+          const idsEnLote = new Set(lista.map((p: any) => p.id));
+          const idsFaltantes: number[] = [];
+
+          for (const ids of mapaIds.values()) {
+            for (const id of ids) {
+              if (!idsEnLote.has(id)) {
+                idsFaltantes.push(id);
+              }
+            }
+          }
+
+          const cargarFaltantes: Observable<any>[] = idsFaltantes.map(id =>
+            forkJoin({
+              detalles: this.pokemonService.getPokemonDetails(id),
+              especie: this.pokemonService.getPokemonSpecies(id)
+            })
+          );
+
+          const continuar = (extra: any[]) => {
+            const listaExtra = extra.map((item: any) => ({
+              id: item.detalles.id,
+              nombre: item.detalles.name,
+              imagen: item.detalles.sprites.other['official-artwork'].front_default,
+              tipo: item.detalles.types[0].type.name,
+              urlCadena: item.especie.evolution_chain.url,
+              idsCadena: mapaIds.get(item.especie.evolution_chain.url) ?? [item.detalles.id],
+              esExtra: true
+            }));
+
+            for (const p of lista) {
+              p.idsCadena = mapaIds.get(p.urlCadena) ?? [p.id];
+            }
+
+            this.agrupar([...lista, ...listaExtra]);
+              this.offset += this.LIMITE;
+              this.loading = false;
+              this.cdr.detectChanges();
+              setTimeout(() => this.registrarNuevos(inicio), 0);
+              setTimeout(() => this.revisarSentinel(), 150);
+          };
+
+          if (cargarFaltantes.length > 0) {
+            forkJoin(cargarFaltantes).subscribe((extra: any) => continuar(extra));
+          } else {
+            continuar([]);
+          }
+        });
         },
         error: (err: any) => {
           // si falla todo el batch lo saltamos para no quedarnos trabados
@@ -273,12 +328,33 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  // Extrae todos los IDs de una cadena evolutiva
+  private extraerIds(nodo: any): number[] {
+    const ids: number[] = [];
+    const pila = [nodo];
+    while (pila.length > 0) {
+      const actual = pila.pop()!;
+      const partes = actual.species.url.split('/').filter(Boolean);
+      ids.push(parseInt(partes[partes.length - 1]));
+      for (const siguiente of actual.evolves_to) {
+        pila.push(siguiente);
+      }
+    }
+    return ids;
+  }
+
   private agrupar(lista: any[]): void {
-    // agrupamos por cadena evolutiva para mostrar las evos juntas
+    // Evitar duplicar pokémon que ya existen en grupos previos
+    const idsYaEnGrupos = new Set(
+      this.grupos.flatMap(g => g.evoluciones.map((e: any) => e.id))
+    );
+
     const mapa = new Map<string, any[]>();
 
     for (let i = 0; i < lista.length; i++) {
       const p = lista[i];
+      if (idsYaEnGrupos.has(p.id)) continue;
+
       const g = mapa.get(p.urlCadena) ?? [];
       g.push(p);
       mapa.set(p.urlCadena, g);
@@ -287,7 +363,8 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
     const nuevos: GrupoEvolutivo[] = Array.from(mapa.values())
       .map(g => {
         const s = g.sort((a, b) => a.id - b.id);
-        return { base: s[0], evoluciones: s, visible: true, alto: 300 };
+        const idsCadena: number[] = s[0].idsCadena ?? s.map((p: any) => p.id);
+        return { base: s[0], evoluciones: s, idsCadena, visible: true, alto: 300 };
       })
       .sort((a, b) => a.base.id - b.base.id);
 
