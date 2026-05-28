@@ -4,7 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { NgClass, TitleCasePipe, UpperCasePipe, KeyValuePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin, Observable, of } from 'rxjs';
-import { switchMap, map, catchError, of } from 'rxjs/operators';
+import { switchMap, map, catchError} from 'rxjs/operators';
 
 interface GrupoEvolutivo {
   base: {
