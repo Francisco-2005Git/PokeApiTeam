@@ -28,4 +28,11 @@ export class PokemonService {
   getEvolutionChain(url: string): Observable<any> {
     return this.http.get(url);
   }
+
+  getPokemonSpeciesByUrl(url: string): Observable<any> {
+    return this.http.get(url);
+  }
+  getPokemonVarieties(speciesId: string | number): Observable<any> {
+    return this.http.get(`${this.url}/pokemon-species/${speciesId}`);
+  }
 }

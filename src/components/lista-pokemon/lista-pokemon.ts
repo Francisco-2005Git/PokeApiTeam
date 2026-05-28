@@ -55,19 +55,16 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pokemonService.getPokemonList(1025, 0).subscribe(resp => {
-      let listaTemporal = [];
-      for (let i = 0; i < resp.results.length; i++) {
-        listaTemporal.push({
-          id: (i + 1).toString(),
-          nombre: resp.results[i].name
-        });
-      }
-      this.listaPokemonCompleta = listaTemporal;
+    this.pokemonService.getPokemonList(20000, 0).subscribe(resp => {
+      this.listaPokemonCompleta = resp.results.map((p: any) => {
+        const partes = p.url.split('/').filter(Boolean);
+        return {
+          id: partes[partes.length - 1],
+          nombre: p.name
+        };
+      });
       this.calcularConteosGeneracion();
-    });
-
-    this.pedirMas();
+    }); 
   }
 
   ngAfterViewInit(): void {
@@ -107,7 +104,7 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
       else if (id >= 650 && id <= 721) conteos['Gen 6 (Kalos)']++;
       else if (id >= 722 && id <= 809) conteos['Gen 7 (Alola)']++;
       else if (id >= 810 && id <= 905) conteos['Gen 8 (Galar)']++;
-      else if (id >= 906 && id <= 1025) conteos['Gen 9 (Paldea)']++;
+      else if (id >= 906 && id <= 20000) conteos['Gen 9 (Paldea)']++;
     }
 
     this.conteosGeneracion = conteos;
@@ -222,8 +219,8 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
 
     this.pokemonService.getPokemonList(this.LIMITE, this.offset).subscribe(resp => {
-      // paramos en 1025 (fin gen 9), lo que sigue son formas alternativas que no queremos mostrar aqui
-      if (this.offset + this.LIMITE >= 1025) this.hayMas = false;
+      // paramos en 20000 (fin gen 9), lo que sigue son formas alternativas que no queremos mostrar aqui
+      if (this.offset + this.LIMITE >= 20000) this.hayMas = false;
 
       // primero pedimos los detalles, y con el nombre de especie que nos devuelven
       // pedimos la especie -- esto evita el 404 que pasa con nombres como "deoxys-normal"
@@ -243,9 +240,9 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
         next: (data: any) => {
           const inicio = this.grupos.length;
 
-          // filtramos los que fallaron o no tienen cadena evolutiva, y los que son formas (id > 1025)
+          // filtramos los que fallaron o no tienen cadena evolutiva, y los que son formas (id > 20000)
           const lista = data
-            .filter((item: any) => item !== null && item.especie?.evolution_chain && item.detalles.id <= 1025)
+            .filter((item: any) => item !== null && item.especie?.evolution_chain && item.detalles.id <= 20000)
             .map((item: any) => ({
               id: item.detalles.id,
               nombre: item.detalles.name,

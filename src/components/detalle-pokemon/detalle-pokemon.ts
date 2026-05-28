@@ -3,6 +3,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgClass, NgIf, NgFor, TitleCasePipe, UpperCasePipe } from '@angular/common';
 import { PokemonService } from '../../services/pokemon';
 import { forkJoin } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-detalle-pokemon',
@@ -16,6 +17,8 @@ export class DetallePokemon implements OnInit {
   galeria: string[] = [];
   tipo: string = '';
   evoluciones: any[] = [];
+  especieId: string = '';
+  sufijoForma: string = '';
 
   //Variable para la URL de la imagen de fondo de la región
   regionBackgroundImageUrl: string = '';
@@ -24,7 +27,8 @@ export class DetallePokemon implements OnInit {
     private route: ActivatedRoute,
     private pokemonService: PokemonService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -47,40 +51,81 @@ export class DetallePokemon implements OnInit {
   }
 
   cargarDatos(id: string): void {
-    // juntamos los dos requests en un forkJoin para setear todo de una sola vez
-    // asi evitamos el NG0100 que pasa cuando cada subscribe llama detectChanges por separado
-    forkJoin({
-      detalles: this.pokemonService.getPokemonDetails(id),
-      especie: this.pokemonService.getPokemonSpecies(id)
-    }).subscribe({
-      error: () => this.router.navigate(['/']),
-      next: ({ detalles, especie }) => {
-      this.pokemon = detalles;
-      this.tipo = detalles.types[0].type.name;
+    this.pokemonService.getPokemonDetails(id).subscribe({
+      next: (detalles) => {
+        this.pokemon = detalles;
+        this.tipo = detalles.types[0].type.name;
 
-      // filtramos nulls porque algunos sprites no existen en la api
-      this.galeria = [
-        detalles.sprites.front_default,
-        detalles.sprites.back_default,
-        detalles.sprites.front_shiny,
-      ].filter(img => img !== null);
+        this.galeria = [
+          detalles.sprites.front_default,
+          detalles.sprites.back_default,
+          detalles.sprites.front_shiny,
+        ].filter(img => img !== null);
 
-      const txt = especie.flavor_text_entries.find(
-        (e: any) => e.language.name === 'es'
-      );
-      this.descripcion = txt
-        ? txt.flavor_text.replace(/\f|\n/g, ' ')
-        : 'Sin descripción.';
-
-      this.establecerImagenFondoRegion(especie.id);
-      this.cdr.detectChanges(); // un solo detectChanges para todo lo de arriba
-
-      this.pokemonService.getEvolutionChain(especie.evolution_chain.url).subscribe(data => {
-        this.evoluciones = [];
-        this.buscarCamino(data.chain, this.pokemon.id.toString());
         this.cdr.detectChanges();
-      });
-    }
+
+        this.http.get(detalles.species.url).subscribe({
+          next: (especie: any) => {
+            const txt = especie.flavor_text_entries.find(
+              (e: any) => e.language.name === 'es'
+            );
+            this.descripcion = txt
+              ? txt.flavor_text.replace(/\f|\n/g, ' ')
+              : 'Sin descripción.';
+
+            this.establecerImagenFondoRegion(especie.id);
+            this.especieId = especie.id.toString();
+
+            const sufijos = ['-alola', '-galar', '-hisui', '-paldea', '-hisuian'];
+            this.sufijoForma = sufijos.find(s => detalles.name.includes(s)) ?? '';
+
+            this.cdr.detectChanges();
+
+            this.pokemonService.getEvolutionChain(especie.evolution_chain.url).subscribe(chain => {
+              const eslabones: any[] = [];
+              this.extraerEslabones(chain.chain, eslabones);
+
+              if (!this.sufijoForma) {
+                this.evoluciones = [];
+                this.buscarCamino(chain.chain, especie.id.toString());
+                this.cdr.detectChanges();
+                return;
+              }
+
+              const llamadas = eslabones.map((eslabon: any) =>
+                this.pokemonService.getPokemonVarieties(eslabon.id)
+              );
+
+              forkJoin(llamadas).subscribe((especies: any[]) => {
+                this.evoluciones = eslabones.map((eslabon: any, i: number) => {
+                  const variedad = especies[i].varieties.find((v: any) =>
+                    v.pokemon.name.endsWith(this.sufijoForma)
+                  );
+                  if (variedad) {
+                    const partes = variedad.pokemon.url.split('/').filter(Boolean);
+                    return {
+                      nombre: variedad.pokemon.name,
+                      id: partes[partes.length - 1]
+                    };
+                  }
+                  return eslabon;
+                });
+                this.cdr.detectChanges();
+              });
+            });
+          },
+          error: () => {
+            this.descripcion = 'Sin descripción disponible para esta forma.';
+            this.regionBackgroundImageUrl = '';
+            this.evoluciones = [];
+            this.cdr.detectChanges();
+          }
+        });
+      },
+      error: () => {
+        this.descripcion = 'Pokémon no encontrado.';
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -119,6 +164,16 @@ export class DetallePokemon implements OnInit {
 
     this.evoluciones.pop();
     return false;
+  }
+
+  private extraerEslabones(nodo: any, resultado: any[]): void {
+    const partes = nodo.species.url.split('/').filter(Boolean);
+    const id = partes[partes.length - 1];
+    resultado.push({ nombre: nodo.species.name, id });
+    // solo seguimos la cadena lineal, sin bifurcaciones
+    if (nodo.evolves_to?.length >= 1) {
+      this.extraerEslabones(nodo.evolves_to[0], resultado);
+    }
   }
 
   // sigue la cadena cuando es lineal (un solo siguiente) hasta llegar al final
