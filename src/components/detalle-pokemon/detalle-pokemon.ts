@@ -1,5 +1,5 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgClass, NgIf, NgFor, TitleCasePipe, UpperCasePipe } from '@angular/common';
 import { PokemonService } from '../../services/pokemon';
 import { forkJoin } from 'rxjs';
@@ -23,11 +23,12 @@ export class DetallePokemon implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private pokemonService: PokemonService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    // escuchamos cambios en la url para cuando navegas entre pokemones
+    // escucha cambios en la url para cuando se navega entre pokemones
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
@@ -51,7 +52,9 @@ export class DetallePokemon implements OnInit {
     forkJoin({
       detalles: this.pokemonService.getPokemonDetails(id),
       especie: this.pokemonService.getPokemonSpecies(id)
-    }).subscribe(({ detalles, especie }) => {
+    }).subscribe({
+      error: () => this.router.navigate(['/']),
+      next: ({ detalles, especie }) => {
       this.pokemon = detalles;
       this.tipo = detalles.types[0].type.name;
 
@@ -77,6 +80,7 @@ export class DetallePokemon implements OnInit {
         this.buscarCamino(data.chain, this.pokemon.id.toString());
         this.cdr.detectChanges();
       });
+    }
     });
   }
 
@@ -95,10 +99,10 @@ export class DetallePokemon implements OnInit {
 
     if (id === idBuscado) {
       if (nodo.evolves_to?.length === 1) {
-        // cadena lineal: seguimos hasta el final
+        // cadena lineal: Sigue hasta el final
         this.seguirLineal(nodo.evolves_to[0]);
       } else if (nodo.evolves_to?.length > 1) {
-        // tiene varias ramas: las mostramos todas sin profundizar en cada una
+        // tiene varias ramas: Se muestran todas sin profundizar en cada una
         nodo.evolves_to.forEach((sig: any) => {
           const sigPartes = sig.species.url.split('/');
           this.evoluciones.push({ nombre: sig.species.name, id: sigPartes[sigPartes.length - 2] });
@@ -145,7 +149,7 @@ export class DetallePokemon implements OnInit {
 
   //Función para determinar la región y establecer la imagen de fondo
   establecerImagenFondoRegion(id: number): void {
-    // Mapeamos las regiones a las imágenes en tu carpeta assets
+    // Se mapean las regiones a las imágenes en la carpeta assets
     const mapRegiones: { [key: string]: string } = {
       'Kanto': 'assets/regions/kanto_bg.png',
       'Johto': 'assets/regions/johto_bg.png',
@@ -159,7 +163,7 @@ export class DetallePokemon implements OnInit {
     };
     
     let region = '';
-    // Mantenemos la lógica de rangos que diseñaste
+    // lógica de rangos
     if (id >= 1 && id <= 151) region = 'Kanto';
     else if (id >= 152 && id <= 251) region = 'Johto';
     else if (id >= 252 && id <= 386) region = 'Hoenn';
@@ -170,7 +174,7 @@ export class DetallePokemon implements OnInit {
     else if (id >= 810 && id <= 905) region = 'Galar';
     else if (id >= 906 && id <= 1025) region = 'Paldea';
     
-    // Asignamos la URL
+    // Se asigna la URL
     this.regionBackgroundImageUrl = mapRegiones[region] || '';
   }
 }

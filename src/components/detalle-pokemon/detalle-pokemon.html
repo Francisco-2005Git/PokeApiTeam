@@ -68,10 +68,10 @@
       <div class="evoluciones-lista">
         <div *ngFor="let evo of evoluciones; let i = index" class="evo-grupo">
           <div class="evo-item"
-               [ngClass]="{'pokemon-actual': evo.id === pokemon.id.toString()}"
-               [routerLink]="['/pokemon', evo.id]">
+              [ngClass]="{'pokemon-actual': evo.id === pokemon.id.toString()}"
+              [routerLink]="['/pokemon', evo.id]">
             <img [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + evo.id + '.png'"
-                 [alt]="evo.nombre">
+              [alt]="evo.nombre">
             <span>{{ evo.nombre | titlecase }}</span>
           </div>
           <span class="evo-flecha" *ngIf="i < evoluciones.length - 1">▶</span>

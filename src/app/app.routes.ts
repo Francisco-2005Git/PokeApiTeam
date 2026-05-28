@@ -6,5 +6,6 @@ import { FiltroRegiones } from '../components/filtro-regiones/filtro-regiones';
 export const routes: Routes = [
   { path: '', component: ListaPokemon },
   { path: 'pokemon/:id', component: DetallePokemon },
-  { path: 'generacion/:num', component: FiltroRegiones }
+  { path: 'generacion/:num', component: FiltroRegiones },
+  { path: '**', redirectTo: '' }
 ];
