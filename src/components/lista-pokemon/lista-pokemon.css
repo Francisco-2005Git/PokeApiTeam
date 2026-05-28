@@ -18,6 +18,15 @@
   margin-bottom: 2rem;
 }
 
+/* logo imagen */
+.logo-panchodex {
+  display: block;
+  margin: 0 auto 2rem;
+  max-width: 350px;
+  width: 100%;
+  image-rendering: pixelated;
+}
+
 .pokedex-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -225,7 +234,7 @@
 .fairy    { background-color: #EE99AC; border: 3px solid #9B6470; }
 
 
-/* Botón retro duro */
+/* Botón retro durisimo */
 .btn-retro-duro {
   background-color: #333;
   color: white;
@@ -247,24 +256,78 @@
   margin-bottom: 1.5rem;
 }
 
+/* barra de busqueda */
+.barra-busqueda-contenedor {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+  align-items: stretch;
+}
+
+.input-busqueda {
+  flex: 1;
+  padding: 12px 16px;
+  background-color: #1a1a1a;
+  color: #fff;
+  border: 3px solid #000;
+  border-radius: 5px;
+  box-shadow: 3px 3px 0 #000;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.45rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.input-busqueda::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* al enfocar le ponemos el borde rojo del sistema */
+.input-busqueda:focus {
+  border-color: #cc0000;
+  box-shadow: 3px 3px 0 #000, 0 0 0 2px rgba(200, 0, 0, 0.3);
+}
+
+.btn-busqueda {
+  padding: 12px 18px;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.45rem;
+  white-space: nowrap;
+}
+
 /* Regiones */
-.pokxgen{
+.pokxgen {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 15px;
 }
+
 .item-generacion {
   display: inline-block;
+  position: relative;
   padding: 20px;
   width: 350px;
-  background-color: #f54545;
+  /* el rojo semitransparente se mezcla con la imagen de fondo */
+  background-color: rgba(220, 60, 60, 0.45);
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: multiply;
   color: white;
   border: 3px solid #000;
   border-radius: 5px;
-  box-shadow: inset 2px 2px 5px rgba(241, 56, 56, 0.2), 3px 3px 0 #000;
+  box-shadow: 3px 3px 0 #000;
   cursor: pointer;
   text-transform: uppercase;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  transition: background-color 0.2s;
 }
-.item-generacion:hover { background-color: #fd2323; }
-.item-generacion:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+
+.item-generacion:hover {
+  background-color: rgba(230, 80, 80, 0.35);
+}
+
+.item-generacion:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 #000;
+}

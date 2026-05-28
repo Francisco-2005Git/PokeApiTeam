@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NgClass, NgIf, NgFor, TitleCasePipe, UpperCasePipe } from '@angular/common';
 import { PokemonService } from '../../services/pokemon';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-detalle-pokemon',
@@ -16,7 +17,7 @@ export class DetallePokemon implements OnInit {
   tipo: string = '';
   evoluciones: any[] = [];
 
-  // NUEVO: Variable para la URL de la imagen de fondo de la región
+  //Variable para la URL de la imagen de fondo de la región
   regionBackgroundImageUrl: string = '';
 
   constructor(
@@ -35,7 +36,7 @@ export class DetallePokemon implements OnInit {
         this.evoluciones = [];
         this.descripcion = '';
         
-        // NUEVO: Limpiamos la imagen anterior al cambiar de Pokémon
+        //Limpiamos la imagen anterior al cambiar de Pokémon
         this.regionBackgroundImageUrl = ''; 
         
         this.cdr.detectChanges();
@@ -45,7 +46,12 @@ export class DetallePokemon implements OnInit {
   }
 
   cargarDatos(id: string): void {
-    this.pokemonService.getPokemonDetails(id).subscribe(detalles => {
+    // juntamos los dos requests en un forkJoin para setear todo de una sola vez
+    // asi evitamos el NG0100 que pasa cuando cada subscribe llama detectChanges por separado
+    forkJoin({
+      detalles: this.pokemonService.getPokemonDetails(id),
+      especie: this.pokemonService.getPokemonSpecies(id)
+    }).subscribe(({ detalles, especie }) => {
       this.pokemon = detalles;
       this.tipo = detalles.types[0].type.name;
 
@@ -56,37 +62,76 @@ export class DetallePokemon implements OnInit {
         detalles.sprites.front_shiny,
       ].filter(img => img !== null);
 
-      this.cdr.detectChanges();
-    });
-
-    this.pokemonService.getPokemonSpecies(id).subscribe(especie => {
       const txt = especie.flavor_text_entries.find(
         (e: any) => e.language.name === 'es'
       );
-      // el texto de la pokedex viene con \f y saltos raros, los quitamos
       this.descripcion = txt
         ? txt.flavor_text.replace(/\f|\n/g, ' ')
         : 'Sin descripción.';
 
-      // NUEVO: Determinamos la región basada en el ID y establecemos la imagen de fondo
       this.establecerImagenFondoRegion(especie.id);
+      this.cdr.detectChanges(); // un solo detectChanges para todo lo de arriba
 
       this.pokemonService.getEvolutionChain(especie.evolution_chain.url).subscribe(data => {
-        this.procesarEvoluciones(data.chain);
+        this.evoluciones = [];
+        this.buscarCamino(data.chain, this.pokemon.id.toString());
         this.cdr.detectChanges();
       });
     });
   }
 
   procesarEvoluciones(cadena: any): void {
-    // la url termina tipo .../12/ entonces sacamos el id de ahi
-    const partes = cadena.species.url.split('/');
-    const id = partes[partes.length - 2];
-    this.evoluciones.push({ nombre: cadena.species.name, id });
+    this.evoluciones = [];
+    this.buscarCamino(cadena, this.pokemon.id.toString());
+  }
 
-    // si tiene evoluciones llamamos recursivo para cada una
-    if (cadena.evolves_to?.length > 0) {
-      cadena.evolves_to.forEach((sig: any) => this.procesarEvoluciones(sig));
+  // recorre el arbol buscando el camino que pasa por el pokemon actual
+  // cuando lo encuentra, decide si seguir la cadena lineal o mostrar las ramas
+  private buscarCamino(nodo: any, idBuscado: string): boolean {
+    const partes = nodo.species.url.split('/');
+    const id = partes[partes.length - 2];
+
+    this.evoluciones.push({ nombre: nodo.species.name, id });
+
+    if (id === idBuscado) {
+      if (nodo.evolves_to?.length === 1) {
+        // cadena lineal: seguimos hasta el final
+        this.seguirLineal(nodo.evolves_to[0]);
+      } else if (nodo.evolves_to?.length > 1) {
+        // tiene varias ramas: las mostramos todas sin profundizar en cada una
+        nodo.evolves_to.forEach((sig: any) => {
+          const sigPartes = sig.species.url.split('/');
+          this.evoluciones.push({ nombre: sig.species.name, id: sigPartes[sigPartes.length - 2] });
+        });
+      }
+      return true;
+    }
+
+    for (const sig of (nodo.evolves_to ?? [])) {
+      if (this.buscarCamino(sig, idBuscado)) {
+        return true;
+      }
+    }
+
+    this.evoluciones.pop();
+    return false;
+  }
+
+  // sigue la cadena cuando es lineal (un solo siguiente) hasta llegar al final
+  // si en algun punto hay bifurcacion, muestra todas las ramas de ese punto
+  private seguirLineal(nodo: any): void {
+    const partes = nodo.species.url.split('/');
+    const id = partes[partes.length - 2];
+    this.evoluciones.push({ nombre: nodo.species.name, id });
+
+    if (nodo.evolves_to?.length === 1) {
+      this.seguirLineal(nodo.evolves_to[0]);
+    } else if (nodo.evolves_to?.length > 1) {
+      // el siguiente eslabón ya tiene ramas, las mostramos todas
+      nodo.evolves_to.forEach((sig: any) => {
+        const sigPartes = sig.species.url.split('/');
+        this.evoluciones.push({ nombre: sig.species.name, id: sigPartes[sigPartes.length - 2] });
+      });
     }
   }
 
@@ -98,7 +143,7 @@ export class DetallePokemon implements OnInit {
     }
   }
 
-  // NUEVO: Función para determinar la región y establecer la imagen de fondo
+  //Función para determinar la región y establecer la imagen de fondo
   establecerImagenFondoRegion(id: number): void {
     // Mapeamos las regiones a las imágenes en tu carpeta assets
     const mapRegiones: { [key: string]: string } = {

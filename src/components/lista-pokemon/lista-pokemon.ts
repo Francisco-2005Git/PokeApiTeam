@@ -1,9 +1,10 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef, ElementRef, ViewChild, NgZone } from '@angular/core';
 import { PokemonService } from '../../services/pokemon';
-import { Router, RouterLink } from '@angular/router'; // NUEVO: Importamos Router para la búsqueda
-import { NgClass, TitleCasePipe, UpperCasePipe, KeyValuePipe } from '@angular/common'; // NUEVO: Importamos KeyValuePipe
-import { FormsModule } from '@angular/forms'; // NUEVO: Importamos FormsModule para el ngModel de la búsqueda
-import { forkJoin, Observable } from 'rxjs';
+import { Router, RouterLink } from '@angular/router';
+import { NgClass, TitleCasePipe, UpperCasePipe, KeyValuePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { forkJoin, Observable, of } from 'rxjs';
+import { switchMap, map, catchError } from 'rxjs/operators';
 
 interface GrupoEvolutivo {
   base: {
@@ -20,7 +21,6 @@ interface GrupoEvolutivo {
 
 @Component({
   selector: 'app-lista-pokemon',
-  // NUEVO: Agregamos FormsModule y KeyValuePipe a los imports
   imports: [RouterLink, NgClass, TitleCasePipe, UpperCasePipe, FormsModule, KeyValuePipe],
   providers: [PokemonService],
   templateUrl: './lista-pokemon.html',
@@ -32,7 +32,7 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
   loading = false;
   hayMas = true;
 
-  // NUEVO: Variables para el buscador y las generaciones
+  //Variables para el buscador y las generaciones
   listaPokemonCompleta: any[] = [];
   conteosGeneracion: { [key: string]: number } = {};
   terminoBusqueda: string = '';
@@ -50,13 +50,11 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
     private pokemonService: PokemonService,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
-    private router: Router // NUEVO: Inyectamos el Router
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    // NUEVO: Cargar la lista completa al inicio para conteos y búsqueda (hasta Paldea, ID 1025)
     this.pokemonService.getPokemonList(1025, 0).subscribe(resp => {
-      // Usando un ciclo tradicional for en lugar de map/forEach para mayor claridad
       let listaTemporal = [];
       for (let i = 0; i < resp.results.length; i++) {
         listaTemporal.push({
@@ -83,7 +81,7 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
     this.obsVisible?.disconnect();
   }
 
-  // NUEVO: Función para calcular los conteos por generación
+  // cuenta cuantos pokemon hay en cada gen
   private calcularConteosGeneracion(): void {
     const conteos: { [key: string]: number } = {
       'Gen 1 (Kanto)': 0,
@@ -97,7 +95,6 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
       'Gen 9 (Paldea)': 0
     };
 
-    // Usando un for loop tradicional
     for (let i = 0; i < this.listaPokemonCompleta.length; i++) {
       const p = this.listaPokemonCompleta[i];
       const id = parseInt(p.id);
@@ -113,10 +110,25 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.conteosGeneracion = conteos;
-    this.cdr.detectChanges(); // Forzamos actualización de vista por si acaso
+    this.cdr.detectChanges(); // a veces no refresca solo
   }
 
-  // NUEVO: Función de búsqueda
+  // devuelve la imagen de la region segun la gen
+  getRegionImg(key: string): string {
+    const mapa: { [k: string]: string } = {
+      'Gen 1 (Kanto)':   '/assets/regions/kanto_bg.png',
+      'Gen 2 (Johto)':   '/assets/regions/johto_bg.png',
+      'Gen 3 (Hoenn)':   '/assets/regions/hoenn_bg.png',
+      'Gen 4 (Sinnoh)':  '/assets/regions/sinnoh_bg.png',
+      'Gen 5 (Teselia)': '/assets/regions/unova_bg.png',
+      'Gen 6 (Kalos)':   '/assets/regions/kalos_bg.png',
+      'Gen 7 (Alola)':   '/assets/regions/alola_bg.png',
+      'Gen 8 (Galar)':   '/assets/regions/galar_bg.png',
+      'Gen 9 (Paldea)':  '/assets/regions/paldea_bg.png',
+    };
+    return mapa[key] ?? '';
+  }
+
   buscarPokemon(): void {
     if (this.terminoBusqueda.trim() === '') {
       return;
@@ -125,7 +137,6 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
     const terminoMin = this.terminoBusqueda.toLowerCase().trim();
     let pokemonEncontrado = null;
 
-    // Usando for tradicional para buscar
     for (let i = 0; i < this.listaPokemonCompleta.length; i++) {
       const p = this.listaPokemonCompleta[i];
       if (p.id === terminoMin || p.nombre.toLowerCase() === terminoMin) {
@@ -135,7 +146,6 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (pokemonEncontrado) {
-      // Si existe, navegamos a su detalle
       this.router.navigate(['/pokemon', pokemonEncontrado.id]);
     } else {
       console.log('Pokémon no encontrado.');
@@ -148,7 +158,6 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
       this.obsVisible = new IntersectionObserver(entries => {
         let cambio = false;
 
-        // Mantengo tu forEach original aquí por temas de compatibilidad con la API del Observer
         entries.forEach(entry => {
           const idx = parseInt(entry.target.getAttribute('data-index') ?? '-1');
           const g = this.grupos[idx];
@@ -198,7 +207,6 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
 
   private registrarNuevos(inicio: number): void {
     const tarjetas = document.querySelectorAll<HTMLElement>('.grupo-evolutivo[data-index]');
-    // Mantenemos forEach para los NodeLists de tu diseño
     tarjetas.forEach(t => {
       const idx = parseInt(t.getAttribute('data-index') ?? '-1');
       if (idx >= inicio && !this.yaRegistrados.has(idx)) {
@@ -213,43 +221,62 @@ export class ListaPokemon implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
 
     this.pokemonService.getPokemonList(this.LIMITE, this.offset).subscribe(resp => {
-      // si ya no hay mas pokemon en la api
-      if (this.offset + this.LIMITE >= resp.count) this.hayMas = false;
+      // paramos en 1025 (fin gen 9), lo que sigue son formas alternativas que no queremos mostrar aqui
+      if (this.offset + this.LIMITE >= 1025) this.hayMas = false;
 
-      const llamadas: Observable<any>[] = resp.results.map((p: any) =>
-        forkJoin({
-          detalles: this.pokemonService.getPokemonDetails(p.name),
-          especie: this.pokemonService.getPokemonSpecies(p.name)
-        })
+      // primero pedimos los detalles, y con el nombre de especie que nos devuelven
+      // pedimos la especie -- esto evita el 404 que pasa con nombres como "deoxys-normal"
+      const llamadas = resp.results.map((p: any) =>
+        this.pokemonService.getPokemonDetails(p.name).pipe(
+          switchMap(detalles =>
+            this.pokemonService.getPokemonSpecies(detalles.species.name).pipe(
+              map(especie => ({ detalles, especie })),
+              catchError(() => of({ detalles, especie: null }))
+            )
+          ),
+          catchError(() => of(null))
+        )
       );
 
-      forkJoin(llamadas as any).subscribe((data: any) => {
-        const inicio = this.grupos.length;
+      forkJoin(llamadas).subscribe({
+        next: (data: any) => {
+          const inicio = this.grupos.length;
 
-        const lista = data.map((item: any) => ({
-          id: item.detalles.id,
-          nombre: item.detalles.name,
-          imagen: item.detalles.sprites.other['official-artwork'].front_default,
-          tipo: item.detalles.types[0].type.name,
-          urlCadena: item.especie.evolution_chain.url
-        }));
+          // filtramos los que fallaron o no tienen cadena evolutiva, y los que son formas (id > 1025)
+          const lista = data
+            .filter((item: any) => item !== null && item.especie?.evolution_chain && item.detalles.id <= 1025)
+            .map((item: any) => ({
+              id: item.detalles.id,
+              nombre: item.detalles.name,
+              imagen: item.detalles.sprites.other['official-artwork']?.front_default ?? '',
+              tipo: item.detalles.types[0].type.name,
+              urlCadena: item.especie.evolution_chain.url
+            }));
 
-        this.agrupar(lista);
-        this.offset += this.LIMITE;
-        this.loading = false;
-        this.cdr.detectChanges();
+          this.agrupar(lista);
+          this.offset += this.LIMITE;
+          this.loading = false;
+          this.cdr.detectChanges();
 
-        setTimeout(() => this.registrarNuevos(inicio), 0);
-        setTimeout(() => this.revisarSentinel(), 150);
+          setTimeout(() => this.registrarNuevos(inicio), 0);
+          setTimeout(() => this.revisarSentinel(), 150);
+        },
+        error: (err: any) => {
+          // si falla todo el batch lo saltamos para no quedarnos trabados
+          console.error('fallo un batch completo, saltando rango...', err);
+          this.offset += this.LIMITE;
+          this.loading = false;
+          this.cdr.detectChanges();
+          setTimeout(() => this.revisarSentinel(), 500);
+        }
       });
     });
   }
 
   private agrupar(lista: any[]): void {
-    // usamos un Map para agrupar por cadena evolutiva
+    // agrupamos por cadena evolutiva para mostrar las evos juntas
     const mapa = new Map<string, any[]>();
-    
-    // Usando for tradicional en la lógica nueva para mayor claridad
+
     for (let i = 0; i < lista.length; i++) {
       const p = lista[i];
       const g = mapa.get(p.urlCadena) ?? [];

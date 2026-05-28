@@ -91,9 +91,7 @@
   position: relative;
   z-index: 3;
   filter:
-    hue-rotate(185deg)
-    saturate(3)
-    brightness(1.7)
+    brightness(1.2)
     drop-shadow(0 0 8px rgba(0, 210, 255, 1))
     drop-shadow(0 0 20px rgba(0, 180, 255, 0.8))
     drop-shadow(0 0 50px rgba(0, 120, 255, 0.5));
@@ -110,14 +108,14 @@
 @keyframes glitch {
   0%, 85%, 100% {
     opacity: 1;
-    filter: hue-rotate(185deg) saturate(3) brightness(1.7)
+    filter: brightness(1.2)
       drop-shadow(0 0 8px rgba(0,210,255,1))
       drop-shadow(0 0 20px rgba(0,180,255,0.8))
       drop-shadow(0 0 50px rgba(0,120,255,0.5));
   }
   87% {
     opacity: 0.6;
-    filter: hue-rotate(200deg) saturate(4) brightness(2)
+    filter: brightness(2)
       drop-shadow(3px 0 6px rgba(255,0,100,0.8))
       drop-shadow(-3px 0 6px rgba(0,255,255,0.8));
   }
@@ -516,9 +514,9 @@
   50%       { opacity: 1;   transform: scale(1.2); }
 }
 
-/* --- NUEVOS ESTILOS PARA EL FONDO Y RETRO --- */
+/* fondo de region y boton retro */
 
-/* Aseguramos que el contenedor base pueda contener el fondo absoluto */
+/* el panel necesita position relative para que el fondo absoluto no se salga */
 .holo-panel {
   position: relative;
   overflow: hidden; 

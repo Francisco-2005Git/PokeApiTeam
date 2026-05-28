@@ -1,11 +1,11 @@
 <div class="contenedor-principal">
-  <h1 class="titulo-pokedex">Pokédex</h1>
+  <img src="/assets/img/panchodex_logo.png" alt="Panchodex" class="logo-panchodex">
 
   <div class="barra-busqueda-contenedor">
-    <input 
-      type="search" 
-      placeholder="Buscar por nombre o ID (ej. 25 o Pikachu)" 
-      [(ngModel)]="terminoBusqueda" 
+    <input
+      type="search"
+      placeholder="Buscar por nombre o ID (ej. 25 o Pikachu)"
+      [(ngModel)]="terminoBusqueda"
       class="input-busqueda"
       (keyup.enter)="buscarPokemon()">
     <button class="btn-busqueda btn-retro-duro" (click)="buscarPokemon()">Buscar</button>
@@ -17,8 +17,10 @@
       <h3 class="pokxgen">Pokémon por Generación</h3>
       <ul>
         @for (conteo of conteosGeneracion | keyvalue; track conteo.key) {
-          <li class="item-generacion" [ngClass]="conteo.key" [routerLink]="['/generacion', conteo.key]">
-            <span class="nombre-generacion" >{{ conteo.key }} <span class="valor-generacion">{{ conteo.value }}</span></span>
+          <li class="item-generacion"
+              [routerLink]="['/generacion', conteo.key]"
+              [style.backgroundImage]="'url(' + getRegionImg(conteo.key) + ')'">
+            <span class="nombre-generacion">{{ conteo.key }} <span class="valor-generacion">{{ conteo.value }}</span></span>
           </li>
         }
       </ul>
@@ -75,7 +77,7 @@
           </div>
         }
         @if (!hayMas && grupos.length > 0) {
-          <p class="fin-lista">— Fin de la Pokédex —</p>
+          <p class="fin-lista">— Fin de la Panchódex —</p>
         }
       </div>
 
