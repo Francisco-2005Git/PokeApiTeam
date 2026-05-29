@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { NgClass, NgIf, NgFor, TitleCasePipe, UpperCasePipe } from '@angular/common';
 import { PokemonService } from '../../services/pokemon';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable, lastValueFrom } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -17,6 +17,7 @@ export class DetallePokemon implements OnInit {
   galeria: string[] = [];
   tipo: string = '';
   evoluciones: any[] = [];
+  habilidades: any[] = [];
   especieId: string = '';
   sufijoForma: string = '';
 
@@ -39,6 +40,7 @@ export class DetallePokemon implements OnInit {
         // limpiamos todo antes de cargar el nuevo
         this.pokemon = null;
         this.evoluciones = [];
+        this.habilidades = [];
         this.descripcion = '';
         
         //Limpiamos la imagen anterior al cambiar de Pokémon
@@ -61,6 +63,28 @@ export class DetallePokemon implements OnInit {
           detalles.sprites.back_default,
           detalles.sprites.front_shiny,
         ].filter(img => img !== null);
+
+        // guardamos cuales son ocultas antes de los requests
+        const abilityList = detalles.abilities.map((a: any) => ({
+          url: a.ability.url,
+          esOculta: a.is_hidden
+        }));
+
+        const promises = abilityList.map((a: any) => lastValueFrom(this.http.get<any>(a.url)));
+
+        Promise.all(promises).then((datos: any[]) => {
+          this.habilidades = datos.map((dato: any, i: number) => {
+            const entrada =
+              dato.flavor_text_entries?.find((e: any) => e.language.name === 'es') ||
+              dato.flavor_text_entries?.find((e: any) => e.language.name === 'en');
+            return {
+              nombre: dato.name,
+              descripcion: entrada?.flavor_text?.replace(/\f|\n/g, ' ') || 'Sin descripción.',
+              esOculta: abilityList[i].esOculta
+            };
+          });
+          this.cdr.detectChanges();
+        });
 
         this.cdr.detectChanges();
 

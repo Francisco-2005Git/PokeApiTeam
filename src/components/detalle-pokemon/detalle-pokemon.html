@@ -68,8 +68,8 @@
       <div class="evoluciones-lista">
         <div *ngFor="let evo of evoluciones; let i = index" class="evo-grupo">
           <div class="evo-item"
-               [ngClass]="{'pokemon-actual': evo.id === pokemon.id.toString() || evo.id === especieId}"
-               [routerLink]="['/pokemon', evo.id]">
+              [ngClass]="{'pokemon-actual': evo.id === pokemon.id.toString() || evo.id === especieId}"
+              [routerLink]="['/pokemon', evo.id]">
             <img [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + evo.id + '.png'"
               [alt]="evo.nombre">
             <span>{{ evo.nombre | titlecase }}</span>
@@ -78,7 +78,20 @@
         </div>
       </div>
     </div>
-
+    <div class="habilidades-contenedor caja-datos-retro" *ngIf="habilidades.length > 0">
+      <h3 class="seccion-titulo">Habilidades</h3>
+      <div class="habilidades-lista">
+        <div *ngFor="let hab of habilidades"
+             class="habilidad-item"
+             [ngClass]="{'habilidad-oculta': hab.esOculta}">
+          <div class="habilidad-header">
+            <span class="habilidad-nombre">{{ hab.nombre | titlecase }}</span>
+            <span class="badge-oculta" *ngIf="hab.esOculta">OCULTA</span>
+          </div>
+          <p class="habilidad-desc">{{ hab.descripcion }}</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

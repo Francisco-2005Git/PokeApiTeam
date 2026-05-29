@@ -467,6 +467,63 @@
 
 .pokemon-actual span { color: #4e8234; }
 
+.habilidades-contenedor {
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.habilidades-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.habilidad-item {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.8rem;
+}
+
+.habilidad-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.habilidad-oculta .habilidad-nombre {
+  color: #705898;
+}
+
+.habilidad-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.habilidad-nombre {
+  font-size: 0.5rem;
+  color: #444;
+}
+
+.badge-oculta {
+  font-size: 0.35rem;
+  background: #705898;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.habilidad-desc {
+  font-size: 0.45rem;
+  color: #666;
+  line-height: 2;
+  margin: 0;
+  word-break: break-word;
+}
+
 .btn-regresar {
   position: fixed;
   top: 1rem;

@@ -5,11 +5,11 @@
     <div class="pokedex-grid">
       @for (grupo of grupos; track grupo.base.id; let i = $index) {
         <div class="grupo-evolutivo"
-             [ngClass]="grupo.base.tipo"
-             [attr.data-index]="i">
+            [ngClass]="grupo.base.tipo"
+            [attr.data-index]="i">
           @if (grupo.visible && estaEnRango(grupo.base.id)) {
             <div class="tarjeta-base"
-                 [routerLink]="['/pokemon', grupo.base.id]">
+                [routerLink]="['/pokemon', grupo.base.id]">
               <div class="tarjeta-header">
                 <span class="id-pokemon">
                   #{{ grupo.base.id }}
@@ -36,7 +36,7 @@
               <div class="evoluciones-panel">
                 @for (evo of grupo.evoluciones; track evo.id) {
                   <div class="evo-card"
-                       [routerLink]="['/pokemon', evo.id]">
+                      [routerLink]="['/pokemon', evo.id]">
                     <img
                       [src]="evo.imagen"
                       [alt]="evo.nombre"
@@ -54,7 +54,7 @@
             }
           } @else {
             <div class="grupo-placeholder"
-                 [style.height.px]="grupo.alto">
+                [style.height.px]="grupo.alto">
             </div>
           }
         </div>
